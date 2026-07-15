@@ -1,0 +1,31 @@
+{
+  "name": "self-service-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-service portal for triggering and tracking approved Jenkins infrastructure and application workflows.",
+  "scripts": {
+    "start": "node server.js",
+    "start:local": "node --env-file=.env.local server.js",
+    "build": "ng build --configuration production",
+    "check": "node --check server.js && ng build --configuration production"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^18.2.14",
+    "@angular/cli": "^18.2.14",
+    "@angular/common": "^18.2.13",
+    "@angular/compiler": "^18.2.13",
+    "@angular/core": "^18.2.13",
+    "@angular/forms": "^18.2.13",
+    "@angular/platform-browser": "^18.2.13",
+    "rxjs": "^7.8.1",
+    "tslib": "^2.6.3",
+    "typescript": "~5.5.4",
+    "zone.js": "^0.14.10"
+  }
+}

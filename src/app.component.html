@@ -1,0 +1,585 @@
+<svg style="display:none" aria-hidden="true">
+  <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></symbol>
+  <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="icon-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+  <symbol id="icon-chevron-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="icon-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="icon-external" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></symbol>
+  <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 16 14"/></symbol>
+  <symbol id="icon-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/></symbol>
+  <symbol id="icon-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="icon-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="icon-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="icon-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2L11.5 11.5"/><path d="M15.5 7.5L19 4"/><path d="M17.5 9.5L21 6"/></symbol>
+  <symbol id="icon-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="5.5" y1="5.5" x2="18.5" y2="18.5"/></symbol>
+</svg>
+
+<div class="toast-stack" role="status" aria-live="polite">
+  <div class="toast" *ngFor="let toast of toasts" [ngClass]="toast.type">
+    <span>{{ toast.message }}</span>
+    <button type="button" class="toast-close" (click)="dismissToast(toast.id)" aria-label="Dismiss notification">&times;</button>
+  </div>
+</div>
+
+<button *ngIf="!user" type="button" class="theme-toggle floating" (click)="toggleTheme()" [attr.aria-label]="theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'">
+  <svg class="icon" width="16" height="16"><use [attr.href]="theme === 'dark' ? '#icon-sun' : '#icon-moon'"></use></svg>
+</button>
+
+<main *ngIf="!user" class="login-page">
+  <section class="login-panel">
+    <div class="brand-lockup">
+      <span class="brand-mark">SS</span>
+      <div>
+        <p class="eyebrow">Operations Portal</p>
+        <h1>Self-Service Portal</h1>
+      </div>
+    </div>
+    <p class="muted">Sign in to run approved infrastructure and application workflows.</p>
+
+    <div *ngIf="error" class="alert" role="alert">{{ error }}</div>
+
+    <form class="form" (ngSubmit)="signIn()">
+      <label for="username">Username</label>
+      <input id="username" name="username" [(ngModel)]="login.username" autocomplete="username" required>
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" [(ngModel)]="login.password" autocomplete="current-password" required>
+
+      <button type="submit" [disabled]="loading">
+        <span class="spinner" *ngIf="loading"></span>
+        {{ loading ? 'Signing in...' : 'Sign In' }}
+      </button>
+    </form>
+  </section>
+</main>
+
+<ng-container *ngIf="user">
+<div class="app-shell">
+  <div class="sidebar-overlay" *ngIf="sidebarOpen" (click)="closeSidebar()"></div>
+
+  <aside class="sidebar" [class.open]="sidebarOpen">
+    <button class="brand-button sidebar-brand" type="button" (click)="goDashboard()">
+      <span class="brand-mark small">SS</span>
+      <span>Self-Service Portal</span>
+    </button>
+
+    <nav class="sidebar-nav">
+      <p class="sidebar-label">Menu</p>
+      <button type="button" class="sidebar-link" [class.active]="isDashboardHome()" (click)="goDashboard()">
+        <svg class="icon" width="15" height="15"><use href="#icon-grid"></use></svg> Dashboard
+      </button>
+      <button type="button" class="sidebar-link" [class.active]="showHistory" (click)="openHistory()">
+        <svg class="icon" width="15" height="15"><use href="#icon-clock"></use></svg> History
+        <span class="sidebar-badge" *ngIf="!isAdmin() && myPendingCount > 0">{{ myPendingCount }}</span>
+      </button>
+
+      <ng-container *ngIf="jobs.length > 0">
+        <p class="sidebar-label">Categories</p>
+        <button type="button" class="sidebar-link" *ngFor="let category of categories()" [class.active]="isCategoryActive(category)" (click)="goDashboard(category)">
+          <span class="sidebar-dot" [ngClass]="categoryClass(category)"></span> {{ category }}
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="isAdmin()">
+        <p class="sidebar-label">Admin</p>
+        <button type="button" class="sidebar-link" [class.active]="showApprovals" (click)="openApprovals()">
+          <svg class="icon" width="15" height="15"><use href="#icon-check-circle"></use></svg> Approvals
+          <span class="sidebar-badge" *ngIf="pendingApprovalsCount > 0">{{ pendingApprovalsCount }}</span>
+        </button>
+        <button type="button" class="sidebar-link" [class.active]="showUsers" (click)="openUsers()">
+          <svg class="icon" width="15" height="15"><use href="#icon-users"></use></svg> Users
+        </button>
+      </ng-container>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle labeled" type="button" (click)="toggleTheme()" [attr.aria-label]="theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'">
+        <svg class="icon" width="15" height="15"><use [attr.href]="theme === 'dark' ? '#icon-sun' : '#icon-moon'"></use></svg>
+        <span>{{ theme === 'dark' ? 'Light mode' : 'Dark mode' }}</span>
+      </button>
+      <div class="sidebar-user">
+        <div>
+          <span class="sidebar-user-name">{{ user.displayName }}</span>
+          <small class="role-pill" [class.admin]="isAdmin()">{{ user.role }}</small>
+        </div>
+        <button class="link-button" type="button" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="app-content">
+    <header class="mobile-topbar">
+      <button class="icon-button" type="button" (click)="toggleSidebar()" aria-label="Open navigation menu">
+        <svg class="icon" width="18" height="18"><use href="#icon-menu"></use></svg>
+      </button>
+      <span class="mobile-topbar-brand">Self-Service Portal</span>
+    </header>
+
+  <main class="shell" *ngIf="!selectedJob && !showHistory && !showApprovals && !showUsers">
+    <section class="page-head">
+      <div>
+        <p class="eyebrow">Self-Service</p>
+        <h1>Request Console</h1>
+      </div>
+      <p class="muted">Choose an approved workflow. Every submission runs a Jenkins job with your provided parameters.</p>
+    </section>
+
+    <section class="summary-strip">
+      <div><strong>{{ jobs.length }}</strong><span>approved workflows</span></div>
+      <div><strong>Jenkins</strong><span>parameterized automation</span></div>
+      <div><strong>Live</strong><span>queue and build status</span></div>
+    </section>
+
+    <section class="toolbar">
+      <div class="search-box">
+        <svg class="icon search-icon" width="15" height="15" aria-hidden="true"><use href="#icon-search"></use></svg>
+        <input #searchInput type="search" placeholder="Search workflows... (press / to focus)" [(ngModel)]="searchQuery" aria-label="Search workflows">
+      </div>
+      <div class="chip-row" role="tablist" aria-label="Filter by category">
+        <button type="button" class="chip" [class.active]="activeCategory === null" (click)="setCategory(null)">
+          All <small>{{ jobs.length }}</small>
+        </button>
+        <button type="button" class="chip" *ngFor="let category of categories()" [class.active]="activeCategory === category" [ngClass]="categoryClass(category)" (click)="setCategory(category)">
+          {{ category }}
+        </button>
+      </div>
+    </section>
+
+    <div *ngIf="error" class="alert" role="alert">{{ error }}</div>
+
+    <section class="empty-state" *ngIf="jobs.length === 0 && !error">
+      <strong>No workflows available</strong>
+      <span>Check the portal configuration or refresh the page.</span>
+    </section>
+
+    <section class="empty-state" *ngIf="jobs.length > 0 && filteredJobs().length === 0">
+      <strong>No workflows match your search</strong>
+      <span>Try a different keyword or clear the category filter.</span>
+    </section>
+
+    <section class="grid" *ngIf="filteredJobs().length > 0">
+      <button class="job-card" type="button" *ngFor="let job of filteredJobs()" (click)="openJob(job)">
+        <div class="card-top">
+          <small class="card-kicker" [ngClass]="categoryClass(job.category)">{{ job.category }}</small>
+          <span class="card-arrow">Open <svg class="icon" width="12" height="12"><use href="#icon-arrow-right"></use></svg></span>
+        </div>
+        <span>{{ job.title }}</span>
+        <small>{{ job.description }}</small>
+      </button>
+    </section>
+  </main>
+
+  <main class="shell" *ngIf="showHistory">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <button type="button" (click)="goDashboard()">Dashboard</button>
+      <svg class="icon" width="11" height="11"><use href="#icon-chevron-right"></use></svg>
+      <span>History</span>
+    </nav>
+
+    <section class="page-head">
+      <div>
+        <p class="eyebrow">Self-Service</p>
+        <h1>Run History</h1>
+      </div>
+      <p class="muted">Your last {{ historyRetentionDays }} days of submitted requests. Older entries are removed automatically.</p>
+    </section>
+
+    <div *ngIf="error" class="alert" role="alert">{{ error }}</div>
+
+    <section class="toolbar history-toolbar">
+      <button class="secondary" type="button" (click)="back()">Back to Dashboard</button>
+      <button *ngIf="isAdmin()" class="danger" type="button" (click)="clearHistory()" [disabled]="historyEntries.length === 0">Clear History</button>
+    </section>
+
+    <div class="chip-row" *ngIf="historyEntries.length > 0">
+      <button type="button" class="chip" [class.active]="historyFilter === 'all'" (click)="historyFilter = 'all'">
+        All <small>{{ historyEntries.length }}</small>
+      </button>
+      <button type="button" class="chip" [class.active]="historyFilter === 'pending'" (click)="historyFilter = 'pending'">
+        Pending Approval <small>{{ myPendingCount }}</small>
+      </button>
+    </div>
+
+    <section class="empty-state" *ngIf="!historyLoading && historyEntries.length === 0">
+      <strong>No run history yet</strong>
+      <span>Requests you submit will show up here for {{ historyRetentionDays }} days.</span>
+    </section>
+
+    <section class="empty-state" *ngIf="!historyLoading && historyEntries.length > 0 && filteredHistoryEntries().length === 0">
+      <strong>No pending requests</strong>
+      <span>Everything you've submitted has already been approved, declined, or completed.</span>
+    </section>
+
+    <div class="table-wrap" *ngIf="filteredHistoryEntries().length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Workflow</th>
+            <th>Category</th>
+            <th>Request ID</th>
+            <th>Submitted</th>
+            <th aria-label="Actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let entry of filteredHistoryEntries()">
+            <tr class="data-row" (click)="toggleHistoryDetails(entry.id)">
+              <td><span class="status-pill" [ngClass]="stateClass(entry.status)">{{ entry.label || entry.status }}</span></td>
+              <td>{{ entry.jobTitle }}</td>
+              <td><small class="card-kicker" [ngClass]="categoryClass(entry.category)">{{ entry.category }}</small></td>
+              <td>{{ entry.requestId || '—' }}</td>
+              <td>{{ formatDate(entry.submittedAt) }}</td>
+              <td class="row-actions">
+                <a *ngIf="entry.buildUrl" [href]="entry.buildUrl" target="_blank" rel="noopener" class="icon-button" aria-label="View build" (click)="$event.stopPropagation()">
+                  <svg class="icon" width="14" height="14"><use href="#icon-external"></use></svg>
+                </a>
+                <button *ngIf="isAdmin()" type="button" class="icon-button" aria-label="Delete this history entry" (click)="$event.stopPropagation(); deleteHistoryEntry(entry.id)">
+                  <svg class="icon" width="14" height="14"><use href="#icon-trash"></use></svg>
+                </button>
+              </td>
+            </tr>
+            <tr class="data-row-details" *ngIf="expandedHistoryId === entry.id">
+              <td colspan="6">
+                <p class="muted" *ngIf="entry.declineReason">Decline reason: {{ entry.declineReason }}</p>
+                <ul class="confirm-summary" *ngIf="historyValueEntries(entry).length > 0">
+                  <li *ngFor="let item of historyValueEntries(entry)"><strong>{{ item[0] }}:</strong> {{ item[1] }}</li>
+                </ul>
+                <p class="muted" *ngIf="historyValueEntries(entry).length === 0">No submitted values recorded.</p>
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <main class="shell" *ngIf="showApprovals">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <button type="button" (click)="goDashboard()">Dashboard</button>
+      <svg class="icon" width="11" height="11"><use href="#icon-chevron-right"></use></svg>
+      <span>Approvals</span>
+    </nav>
+
+    <section class="page-head">
+      <div>
+        <p class="eyebrow">Admin</p>
+        <h1>Pending Approvals</h1>
+      </div>
+      <p class="muted">Requests submitted by developers wait here until an admin approves or declines them.</p>
+    </section>
+
+    <div *ngIf="error" class="alert" role="alert">{{ error }}</div>
+
+    <section class="empty-state" *ngIf="!approvalsLoading && approvals.length === 0">
+      <strong>Nothing pending</strong>
+      <span>New developer requests will show up here.</span>
+    </section>
+
+    <section class="approval-list" *ngIf="approvals.length > 0">
+      <article class="panel approval-row" *ngFor="let entry of approvals">
+        <div class="approval-row-head">
+          <div>
+            <small class="card-kicker" [ngClass]="categoryClass(entry.category)">{{ entry.category }}</small>
+            <h2>{{ entry.jobTitle }}</h2>
+            <small class="muted">Requested by {{ entry.requestedBy }} &middot; {{ formatDate(entry.submittedAt) }} &middot; {{ entry.requestId || 'no request id' }}</small>
+          </div>
+        </div>
+        <ul class="confirm-summary" *ngIf="historyValueEntries(entry).length > 0">
+          <li *ngFor="let item of historyValueEntries(entry)"><strong>{{ item[0] }}:</strong> {{ item[1] }}</li>
+        </ul>
+        <div class="actions">
+          <button class="secondary" type="button" (click)="declineApproval(entry)">
+            <svg class="icon" width="14" height="14"><use href="#icon-x"></use></svg> Decline
+          </button>
+          <button type="button" (click)="approveApproval(entry)">
+            <svg class="icon" width="14" height="14"><use href="#icon-check"></use></svg> Approve & Run
+          </button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <main class="shell" *ngIf="showUsers">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <button type="button" (click)="goDashboard()">Dashboard</button>
+      <svg class="icon" width="11" height="11"><use href="#icon-chevron-right"></use></svg>
+      <span>Users</span>
+    </nav>
+
+    <section class="page-head">
+      <div>
+        <p class="eyebrow">Admin</p>
+        <h1>Users</h1>
+      </div>
+      <p class="muted">Create accounts, manage roles, and control access.</p>
+    </section>
+
+    <div *ngIf="error" class="alert" role="alert">{{ error }}</div>
+
+    <section class="panel">
+      <h2>Add a user</h2>
+      <form class="form fields" (ngSubmit)="createUser()">
+        <label>
+          <span>Username</span>
+          <input name="newUsername" [(ngModel)]="newUser.username" autocomplete="off" required>
+        </label>
+        <label>
+          <span>Display name</span>
+          <input name="newDisplayName" [(ngModel)]="newUser.displayName" autocomplete="off">
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="newPassword" [(ngModel)]="newUser.password" autocomplete="new-password" required>
+          <small class="help">At least 8 characters.</small>
+        </label>
+        <label>
+          <span>Role</span>
+          <select name="newRole" [(ngModel)]="newUser.role">
+            <option value="developer">developer</option>
+            <option value="admin">admin</option>
+          </select>
+        </label>
+        <div class="actions wide">
+          <button type="submit" [disabled]="creatingUser">
+            <span class="spinner" *ngIf="creatingUser"></span>
+            {{ creatingUser ? 'Creating...' : 'Create User' }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="empty-state" *ngIf="!usersLoading && adminUsers.length === 0">
+      <strong>No users found</strong>
+    </section>
+
+    <div class="table-wrap" *ngIf="adminUsers.length > 0">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Display Name</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th aria-label="Actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let targetUser of adminUsers">
+            <td>{{ targetUser.username }}</td>
+            <td>{{ targetUser.displayName }}</td>
+            <td><small class="role-pill" [class.admin]="targetUser.role === 'admin'">{{ targetUser.role }}</small></td>
+            <td><span class="status-pill" [ngClass]="targetUser.disabled ? 'failed' : 'success'">{{ targetUser.disabled ? 'Disabled' : 'Active' }}</span></td>
+            <td class="row-actions">
+              <button type="button" class="icon-button" aria-label="Change password" (click)="changeUserPassword(targetUser)">
+                <svg class="icon" width="14" height="14"><use href="#icon-key"></use></svg>
+              </button>
+              <button type="button" class="icon-button" [attr.aria-label]="targetUser.disabled ? 'Enable user' : 'Disable user'" (click)="toggleUserDisabled(targetUser)">
+                <svg class="icon" width="14" height="14"><use [attr.href]="targetUser.disabled ? '#icon-check' : '#icon-ban'"></use></svg>
+              </button>
+              <button type="button" class="icon-button" aria-label="Delete user" (click)="deleteUserPrompt(targetUser)">
+                <svg class="icon" width="14" height="14"><use href="#icon-trash"></use></svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <main class="shell" *ngIf="selectedJob">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <button type="button" (click)="goDashboard()">Dashboard</button>
+      <svg class="icon" width="11" height="11"><use href="#icon-chevron-right"></use></svg>
+      <button type="button" (click)="goDashboard(selectedJob.category)">{{ selectedJob.category }}</button>
+      <svg class="icon" width="11" height="11"><use href="#icon-chevron-right"></use></svg>
+      <span>{{ selectedJob.title }}</span>
+    </nav>
+
+    <section class="page-head">
+      <div>
+        <p class="eyebrow">{{ selectedJob.category }}</p>
+        <h1>{{ selectedJob.title }}</h1>
+      </div>
+      <p class="muted">{{ selectedJob.description }}</p>
+    </section>
+
+    <div *ngIf="error" class="alert" role="alert">{{ error }}</div>
+
+    <section class="panel" *ngIf="!result && !pendingApproval && !declined">
+      <div class="job-target">
+        <div>
+          <span>Configured Jenkins Job</span>
+          <div class="job-target-url" *ngIf="selectedJob.configuredUrl">
+            <a [href]="selectedJob.configuredUrl" target="_blank" rel="noopener">{{ selectedJob.configuredUrl }}</a>
+            <button type="button" class="icon-button" (click)="copyText(selectedJob.configuredUrl)" aria-label="Copy job URL">
+              <svg class="icon" width="14" height="14"><use href="#icon-copy"></use></svg>
+            </button>
+          </div>
+          <strong *ngIf="!selectedJob.configuredUrl">Jenkins environment variables are not configured.</strong>
+        </div>
+        <small>
+          {{ selectedJob.discoveryEnabled
+            ? 'Auto-discovery is enabled. If this configured path is not found, the portal searches Jenkins folders and common self-service job names.'
+            : 'Auto-discovery is disabled. This exact configured path must exist.' }}
+        </small>
+      </div>
+
+      <form class="form fields" (ngSubmit)="requestSubmit()">
+        <ng-container *ngFor="let field of selectedJob.fields">
+          <label *ngIf="fieldVisible(field)" [class.wide]="field.type === 'textarea'" [class.check]="field.type === 'checkbox'" [attr.for]="fieldId(field)">
+            <ng-container [ngSwitch]="field.type">
+              <ng-container *ngSwitchCase="'choice'">
+                <span>{{ field.label }}</span>
+                <select [id]="fieldId(field)" [name]="field.name" [(ngModel)]="values[field.name]">
+                  <option *ngFor="let option of fieldOptions(field)" [value]="option">{{ option }}</option>
+                </select>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="'textarea'">
+                <span>{{ field.label }}</span>
+                <textarea [id]="fieldId(field)" [name]="field.name" rows="4" [(ngModel)]="values[field.name]" [required]="field.required !== false"></textarea>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="'checkbox'">
+                <input [id]="fieldId(field)" type="checkbox" [name]="field.name" [(ngModel)]="values[field.name]">
+                <span>{{ field.label }}</span>
+              </ng-container>
+
+              <ng-container *ngSwitchDefault>
+                <span>{{ field.label }}</span>
+                <input [id]="fieldId(field)" [type]="field.type === 'password' ? 'password' : 'text'" [name]="field.name" [(ngModel)]="values[field.name]" [required]="field.required !== false">
+              </ng-container>
+            </ng-container>
+            <small *ngIf="field.help" class="help">{{ field.help }}</small>
+          </label>
+        </ng-container>
+
+        <div class="validation-summary wide" *ngIf="validationErrors().length > 0">
+          <strong>Before submitting</strong>
+          <ul>
+            <li *ngFor="let item of validationErrors()">{{ item }}</li>
+          </ul>
+        </div>
+
+        <div class="actions wide">
+          <button class="secondary" type="button" (click)="back()">Back</button>
+          <button type="submit" [disabled]="!canSubmit()">
+            <span class="spinner" *ngIf="submitting"></span>
+            {{ submitting ? 'Submitting...' : 'Submit Request' }}
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel result" *ngIf="pendingApproval || declined">
+      <div class="result-head">
+        <div>
+          <p class="eyebrow">Jenkins Request</p>
+          <h2>{{ declined ? 'Request declined' : 'Waiting for approval' }}</h2>
+        </div>
+        <span class="status-pill" [ngClass]="declined ? 'failed' : 'pending'">{{ declined ? 'Declined' : 'Pending Approval' }}</span>
+      </div>
+      <div class="approval-wait-banner" *ngIf="!declined" role="status" aria-live="polite">
+        <svg class="icon" width="16" height="16"><use href="#icon-clock"></use></svg>
+        <span>This request has not been sent to Jenkins yet. An admin needs to approve it first — this page updates automatically.</span>
+      </div>
+      <div class="alert" *ngIf="declined">
+        {{ declineReason || 'This request was declined by an admin and will not run.' }}
+      </div>
+      <table>
+        <tr *ngFor="let item of visibleSubmittedValues()">
+          <th>{{ item[0] }}</th>
+          <td>{{ item[1] }}</td>
+        </tr>
+      </table>
+      <div class="actions">
+        <button class="secondary" type="button" (click)="back()">Back to Dashboard</button>
+      </div>
+    </section>
+
+    <section class="panel result" *ngIf="result">
+      <div class="result-head">
+        <div>
+          <p class="eyebrow">Jenkins Request</p>
+          <h2>Request submitted</h2>
+        </div>
+        <span class="status-pill" [ngClass]="progressClass()">{{ progress?.label || 'Accepted' }}</span>
+      </div>
+      <section class="progress-card" *ngIf="progress">
+        <div class="progress-head">
+          <div>
+            <strong>{{ progress.label }}</strong>
+            <span>{{ progress.message }}</span>
+          </div>
+          <strong>{{ progressPercent() }}%</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" [ngClass]="progressClass()" [style.width.%]="progressPercent()"></div>
+        </div>
+        <div class="progress-meta">
+          <span *ngIf="progress.buildNumber">Build #{{ progress.buildNumber }}</span>
+          <span *ngIf="polling" class="live-dot">Updating every 5 seconds</span>
+          <span *ngIf="isTerminalProgress()">Finished</span>
+        </div>
+      </section>
+
+      <p><strong>Request:</strong> HTTP {{ result.status }}</p>
+      <p *ngIf="result.queueUrl">
+        <strong>Queue:</strong> <a [href]="result.queueUrl" target="_blank" rel="noopener">{{ result.queueUrl }}</a>
+        <button type="button" class="icon-button" (click)="copyText(result.queueUrl)" aria-label="Copy queue URL">
+          <svg class="icon" width="14" height="14"><use href="#icon-copy"></use></svg>
+        </button>
+      </p>
+      <p *ngIf="result.jobUrl">
+        <strong>Job:</strong> <a [href]="result.jobUrl" target="_blank" rel="noopener">{{ result.jobUrl }}</a>
+        <button type="button" class="icon-button" (click)="copyText(result.jobUrl)" aria-label="Copy job URL">
+          <svg class="icon" width="14" height="14"><use href="#icon-copy"></use></svg>
+        </button>
+      </p>
+      <p *ngIf="progress?.buildUrl">
+        <strong>Build:</strong> <a [href]="progress?.buildUrl" target="_blank" rel="noopener">{{ progress?.buildUrl }}</a>
+        <button type="button" class="icon-button" (click)="copyText(progress?.buildUrl || '')" aria-label="Copy build URL">
+          <svg class="icon" width="14" height="14"><use href="#icon-copy"></use></svg>
+        </button>
+      </p>
+      <p *ngIf="progress?.result"><strong>Result:</strong> {{ progress?.result }}</p>
+
+      <table>
+        <tr *ngFor="let item of visibleSubmittedValues()">
+          <th>{{ item[0] }}</th>
+          <td>{{ item[1] }}</td>
+        </tr>
+      </table>
+
+      <div class="actions">
+        <button class="secondary" type="button" (click)="back()">Back to Dashboard</button>
+      </div>
+    </section>
+  </main>
+  </div>
+</div>
+</ng-container>
+
+<div class="modal-overlay" *ngIf="confirmDialog as dialog" (click)="cancelConfirmDialog()">
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title" (click)="$event.stopPropagation()">
+    <p class="eyebrow">Confirm action</p>
+    <h2 id="confirm-title">{{ dialog.title }}</h2>
+    <p class="muted">{{ dialog.message }}</p>
+    <ul class="confirm-summary" *ngIf="dialog.items && dialog.items.length > 0">
+      <li *ngFor="let item of dialog.items"><strong>{{ item[0] }}:</strong> {{ item[1] }}</li>
+    </ul>
+    <label class="modal-input" *ngIf="dialog.input">
+      <span>{{ dialog.input.label }}</span>
+      <input [type]="dialog.input.type" [placeholder]="dialog.input.placeholder || ''" [(ngModel)]="confirmInputValue" name="confirmInputValue" autocomplete="off">
+    </label>
+    <div class="actions">
+      <button class="secondary" type="button" (click)="cancelConfirmDialog()">Cancel</button>
+      <button [class.danger]="dialog.danger" type="button" (click)="runConfirmed()">{{ dialog.confirmLabel }}</button>
+    </div>
+  </div>
+</div>
